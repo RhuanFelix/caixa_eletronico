@@ -1,0 +1,15 @@
+# Ignorar arquivos compilados
+/target/
+*.class
+
+# Logs
+*.log
+
+# Arquivos temporários do sistema
+.DS_Store
+Thumbs.db
+
+# Configurações específicas de IDE
+*.iml
+.idea/
+.vscode/
