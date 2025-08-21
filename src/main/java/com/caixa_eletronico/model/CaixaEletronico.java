@@ -9,9 +9,9 @@ public class CaixaEletronico {
     private Cartao cartaoAtual;
     private Conta contaAtual;
     private Gerente gerenteResponsavel;
-    private ContaDAOPostrgeSQL contaDAO;  // Dependencia do DAO
+    private ContaRepositoryPostrgeSQL contaDAO;  // Dependencia do DAO
 
-    public CaixaEletronico(String id, String endereco, Gerente gerenteResponsavel, ContaDAOPostrgeSQL contaDAO) {
+    public CaixaEletronico(String id, String endereco, Gerente gerenteResponsavel, ContaRepositoryPostrgeSQL contaDAO) {
         this.id = id;
         this.endereco = endereco;
         this.cartaoAtual = null;

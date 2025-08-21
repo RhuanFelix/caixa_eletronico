@@ -1,10 +1,10 @@
-package com.caixa_eletronico.dao;
+package com.caixa_eletronico.repository;
 
 import com.caixa_eletronico.model.Conta;
 import java.util.List;
 import java.util.Optional; // Optional para um retorno mais seguro
 
-public interface ContaDAO {
+public interface ContaRepository {
 
     //Salva uma nova conta no banco de dados.
 
