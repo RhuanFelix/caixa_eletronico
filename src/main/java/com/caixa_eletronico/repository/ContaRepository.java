@@ -2,7 +2,6 @@ package com.caixa_eletronico.repository;
 
 import com.caixa_eletronico.model.Conta;
 import java.util.List;
-import java.util.Optional; // Optional para um retorno mais seguro
 
 public interface ContaRepository {
 
@@ -12,21 +11,20 @@ public interface ContaRepository {
 
     //Atualiza os dados de uma conta existente, principalmente o saldo.
      
-    void atualizar(Conta conta);
+    void atualizarSaldo(Conta conta);
 
     /**
      * Busca uma conta pelo seu número único.
-     * Retorna um Optional, que pode conter a Conta se encontrada, ou estar vazio.
      * numero é O número da conta a ser buscada.
-     * return um Optional<Conta> contendo a conta encontrada ou vazio.
+     * retorna a conta ou null se não encontrada
     */
-    Optional<Conta> buscarPorNumero(String numero);
+    Conta buscarPorNumero(String numero);
 
     /*
      * Busca uma conta pelo seu ID de chave primária.
-     * retorna um Optional<Conta> contendo a conta encontrada ou vazio.
+     * retorna uma conta ou null se não encontrada.
     */
-    Optional<Conta> buscarPorId(long id);
+    Conta buscarPorId(long id);
 
     //Retorna uma lista com todas as contas cadastradas.
 
@@ -34,5 +32,5 @@ public interface ContaRepository {
 
     //Deleta uma conta do banco de dados pelo seu ID.
      
-    void deletar(long id);
+    void deletar(int id);
 }

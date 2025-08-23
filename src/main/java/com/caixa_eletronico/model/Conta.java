@@ -1,7 +1,7 @@
 package com.caixa_eletronico.model;
 
 public class Conta {
-
+    private int id;
     private String numeroConta;
     private double saldoTotal;
     private double saldoDisponivel;
@@ -50,6 +50,9 @@ public class Conta {
         return true;
     }
 
+    public int getId(){
+        return id;
+    }
 
     public String getNumeroConta() {
         return numeroConta;
@@ -65,6 +68,10 @@ public class Conta {
 
     public Cliente getTitular() {
         return titular;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     // Não criamos Setters para os saldos, pois eles só devem ser alterados

@@ -1,6 +1,6 @@
 package com.caixa_eletronico.model;
 
-import com.caixa_eletronico.persistence.*;
+import com.caixa_eletronico.repository.*;
 
 public class CaixaEletronico {
 
@@ -9,15 +9,15 @@ public class CaixaEletronico {
     private Cartao cartaoAtual;
     private Conta contaAtual;
     private Gerente gerenteResponsavel;
-    private ContaRepositoryPostrgeSQL contaDAO;  // Dependencia do DAO
+    private ContaRepository contaRepository;  // Dependencia do respository
 
-    public CaixaEletronico(String id, String endereco, Gerente gerenteResponsavel, ContaRepositoryPostrgeSQL contaDAO) {
+    public CaixaEletronico(String id, String endereco, Gerente gerenteResponsavel, ContaRepository contaRepository) {
         this.id = id;
         this.endereco = endereco;
         this.cartaoAtual = null;
         this.contaAtual = null;
         this.gerenteResponsavel = gerenteResponsavel;
-        this.contaDAO = contaDAO;   // Injetando a dependencia - evita acoplamento
+        this.contaRepository = contaRepository;   // Injetando a dependencia - evita acoplamento
     }
 
 
@@ -33,12 +33,6 @@ public class CaixaEletronico {
         }
     }
 
-    public void encerrarSessao() {
-        this.cartaoAtual = null;
-        this.contaAtual = null;
-        System.out.println("Sessão encerrada. Retire seu cartão.");
-    }
-
     //MÉTODOS DE OPERAÇÕES ---
 
     public void realizarSaque(double valor) {
@@ -47,16 +41,18 @@ public class CaixaEletronico {
             return;
         }
 
-        boolean sucesso = this.contaAtual.sacar(valor);
+        boolean sucesso = this.contaAtual.sacar(valor);     // atualiza o saldo na memoria
 
         if (sucesso) {
+            this.contaRepository.atualizarSaldo(this.contaAtual);   // agora atualiza o saldo no banco
+
             this.dispensarDinheiro(valor);
 
             // CRIA O REGISTRO DA TRANSAÇÃO
             Saque transacao = new Saque(valor, this.contaAtual, this);
             transacao.setStatus("CONCLUIDA");
             
-            // aqui iremos Chamar um TransacaoDAO para salvar o objeto 'transacao' no banco de dados.
+            // aqui iremos Chamar um TransacaoRepository para salvar o objeto 'transacao' no banco de dados.
             System.out.println("Transação de SAQUE registrada com sucesso.");
 
             this.imprimirRecibo("Saque", valor);
@@ -73,18 +69,19 @@ public class CaixaEletronico {
         // Simula o caixa eletrônico recebendo o dinheiro antes de depositar na conta
         this.receberDinheiro(valor);
 
-        this.contaAtual.depositar(valor);
+        this.contaAtual.depositar(valor);       // atualiza o saldo na memoria
+
+        this.contaRepository.atualizarSaldo(this.contaAtual);   // agora atualiza o saldo no banco
 
         // CRIA O REGISTRO DA TRANSAÇÃO
         Deposito transacao = new Deposito(valor, this.contaAtual, this);
         transacao.setStatus("CONCLUIDA");
 
-        // Aqui vamos Chamar um TransacaoDAO para salvar o objeto 'transacao' no banco de dados.
+        // Aqui vamos Chamar um TransacaoRepository para salvar o objeto 'transacao' no banco de dados.
         System.out.println("Transação de DEPÓSITO registrada com sucesso.");
         
         this.imprimirRecibo("Depósito", valor);
     }
-
 
     //Orquestra a operação de transferência entre contas.
 
@@ -104,8 +101,8 @@ public class CaixaEletronico {
             return;
         }
         
-        // 2. Buscar a conta de destino usando o DAO
-        Conta contaDestino = this.contaDAO.buscarPorNumero(numeroContaDestino);
+        // 2. Buscar a conta de destino usando o repository
+        Conta contaDestino = this.contaRepository.buscarPorNumero(numeroContaDestino);
 
         // 3. Validar a conta de destino
         if (contaDestino == null) {
@@ -117,17 +114,21 @@ public class CaixaEletronico {
             return;
         }
 
-        // 4. Executar a transação (ação atômica)
+        // 4. Executar a transação
         boolean sucessoSaque = this.contaAtual.sacar(valor);
         
         if (sucessoSaque) {
             contaDestino.depositar(valor);
 
-            // 5. CRIA O REGISTRO DA TRANSAÇÃO
+            // 5. Persistir AMBAS as mudanças no banco de dados
+            this.contaRepository.atualizarSaldo(this.contaAtual);
+            this.contaRepository.atualizarSaldo(contaDestino);
+
+            // 6. CRIA O REGISTRO DA TRANSAÇÃO
             Transferencia transacao = new Transferencia(valor, this.contaAtual, contaDestino, this);
             transacao.setStatus("CONCLUIDA");
 
-            //aqui vamos Chamar um TransacaoDAO para salvar o objeto 'transacao' no banco de dados.
+            // 7. aqui vamos Chamar um TransacaoDAO para salvar o objeto 'transacao' no banco de dados.
             System.out.println("Transação de TRANSFERÊNCIA registrada com sucesso.");
 
             this.imprimirRecibo("Transferência Enviada", valor);
@@ -145,26 +146,32 @@ public class CaixaEletronico {
 
         // 1. Acessa a informação na conta
         double saldo = this.contaAtual.getSaldoDisponivel();
-        System.out.printlnf("Seu saldo disponível é: R$ %.2f", saldo);
+        System.out.printf("Seu saldo disponível é: R$ %.2f", saldo);
 
         // 2. CRIA O REGISTRO DA TRANSAÇÃO
         ConsultaSaldo transacao = new ConsultaSaldo(this.contaAtual, this);
         transacao.setStatus("CONCLUIDA");
 
-        // 3. aqui Chamar TransacaoDAO para salvar o objeto 'transacao' no banco de dados.
+        // 3. aqui Chamar TransacaoRepository para salvar o objeto 'transacao' no banco de dados.
         System.out.println("Transação de CONSULTA DE SALDO registrada com sucesso.");
+    }
+
+    public void encerrarSessao() {
+        this.cartaoAtual = null;
+        this.contaAtual = null;
+        System.out.println("Sessão encerrada. Retire seu cartão.");
     }
 
     // MÉTODOS PRIVADOS (SIMULAÇÃO DE HARDWARE) ---
     
     private void receberDinheiro(double valor) {
-        System.out.println("--- Hardware Simulation ---");
+        System.out.println("--- Simulação de recebimento do valor ---");
         System.out.println("Aguardando inserção das notas... R$ " + valor + " recebido e validado.");
         System.out.println("---------------------------");
     }
 
     private void dispensarDinheiro(double valor) {
-        System.out.println("--- Hardware Simulation ---");
+        System.out.println("--- Simulação de saque ---");
         System.out.println("Dispensando R$ " + valor + " em notas.");
         System.out.println("---------------------------");
     }
