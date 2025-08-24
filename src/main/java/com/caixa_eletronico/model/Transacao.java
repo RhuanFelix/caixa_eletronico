@@ -1,6 +1,8 @@
 package com.caixa_eletronico.model;
 
 import java.time.LocalDateTime;
+import java.sql.PreparedStatement; 
+import java.sql.SQLException;
 
 public abstract class Transacao {
 
@@ -13,10 +15,25 @@ public abstract class Transacao {
 
     public Transacao(Conta conta, CaixaEletronico caixaEletronico) {
         this.dataCriacao = LocalDateTime.now();
-        this.status = "PENDENTE";
+        this.status = "CONCLUIDA";
         this.conta = conta;
         this.caixaEletronico = caixaEletronico;
     }
+
+    /*
+     * Retorna o tipo da transação como uma String para ser salva no banco (ex: "SAQUE").
+     * Cada subclasse definirá seu próprio tipo.
+     */
+    public abstract String getTipoTransacao();
+
+    /*
+     * Preenche os parâmetros específicos desta transação em um PreparedStatement.
+     * A classe Repository vai preparar o statement, e cada transação saberá
+     * como preencher suas próprias colunas (valor, conta_destino_id, etc.).
+     * pstmt será o PreparedStatement a ser preenchido.
+     * throws SQLException sinaliza que pode lançar exceção de SQL
+     */
+    public abstract void preencherParametrosEspecificos(PreparedStatement pstmt) throws SQLException;
 
     // Getters e Setters
     public void setStatus(String status) { this.status = status; }

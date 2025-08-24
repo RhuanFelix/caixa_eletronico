@@ -1,5 +1,8 @@
 package com.caixa_eletronico.model;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+
 public class Transferencia extends Transacao {
 
     private double valor;
@@ -11,6 +14,18 @@ public class Transferencia extends Transacao {
         this.valor = valor;
         this.contaDestino = contaDestino;
     }
+
+    // Sobrescrevendo os metodos abstratos específicos para o tipo transferencia
+    @Override
+    public String getTipoTransacao() {
+        return "TRANSFERENCIA";
+    }
+
+    @Override
+    public void preencherParametrosEspecificos(PreparedStatement pstmt) throws SQLException {
+        pstmt.setDouble(4, this.getValor());
+        pstmt.setLong(7, this.getContaDestino().getId());
+}
 
     // Getters para os atributos específicos
     public double getValor() {

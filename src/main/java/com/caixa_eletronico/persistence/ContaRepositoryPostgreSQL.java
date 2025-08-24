@@ -5,7 +5,7 @@ import com.caixa_eletronico.repository.ContaRepository;
 import java.util.List;
 import java.sql.*;
 
-public class ContaRepositoryPostrgeSQL implements ContaRepository{
+public class ContaRepositoryPostgreSQL implements ContaRepository{
     @Override
     public Conta buscarPorNumero(String numero) {
         String sql = "SELECT c.id as conta_id, c.numero_conta, c.saldo_total, c.saldo_disponivel, " +

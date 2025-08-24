@@ -9,26 +9,45 @@ public class CaixaEletronico {
     private Cartao cartaoAtual;
     private Conta contaAtual;
     private Gerente gerenteResponsavel;
-    private ContaRepository contaRepository;  // Dependencia do respository
+    private ContaRepository contaRepository;  // Dependencia do respository de conta
+    private CartaoRepository cartaoRepository;  // Dependencia do respository de cartao
+    private TransacaoRepository transacaoRepository;    // Dependencia do respository de transacao
+    
 
-    public CaixaEletronico(String id, String endereco, Gerente gerenteResponsavel, ContaRepository contaRepository) {
+    public CaixaEletronico(String id, String endereco, Gerente gerenteResponsavel, ContaRepository contaRepository, CartaoRepository cartaoRepository, TransacaoRepository transacaoRepository) {
         this.id = id;
         this.endereco = endereco;
         this.cartaoAtual = null;
         this.contaAtual = null;
         this.gerenteResponsavel = gerenteResponsavel;
-        this.contaRepository = contaRepository;   // Injetando a dependencia - evita acoplamento
+        this.contaRepository = contaRepository;   // Inversao da dependencia
+        this.cartaoRepository = cartaoRepository;
+        this.transacaoRepository = transacaoRepository;
     }
 
 
-    public boolean autenticarUsuario(Cartao cartaoInserido, String pinDigitado) {
-        if (cartaoInserido != null && cartaoInserido.isValido() && cartaoInserido.verificarPin(pinDigitado)) {
-            this.cartaoAtual = cartaoInserido;
-            this.contaAtual = cartaoInserido.getConta();
-            System.out.println("Autenticação bem-sucedida. Bem-vindo, " + this.contaAtual.getTitular().getNome());
+    public boolean autenticarUsuario(String numeroDoCartao, String pinDigitado) {
+        // 1. Usa o repository para buscar o cartão no banco de dados.
+        Cartao cartaoDoBanco = this.cartaoRepository.buscarPorNumero(numeroDoCartao);
+
+        // 2. Primeira validação: o cartão existe?
+        if (cartaoDoBanco == null) {
+            System.out.println("Falha na autenticação. Cartão não encontrado.");
+            return false;
+        }
+
+        // 3. Se o cartão existe, agora fazemos as validações no objeto que veio do banco.
+        if (cartaoDoBanco.isValido() && cartaoDoBanco.verificarPin(pinDigitado)) {
+            // Autenticação OK! Preenchemos os dados da sessão.
+            this.cartaoAtual = cartaoDoBanco;
+            this.contaAtual = cartaoDoBanco.getConta();
+            System.out.println("Autenticação bem-sucedida. Bem-vindo, " + this.contaAtual.getTitular().getNome() + "!");
             return true;
         } else {
-            System.out.println("Falha na autenticação. Cartão inválido, expirado ou PIN incorreto.");
+            // Se a validação do PIN ou da data de validade falhou.
+            System.out.println("Falha na autenticação. PIN incorreto ou cartão expirado.");
+            this.cartaoAtual = null; // Garante que a sessão não inicie
+            this.contaAtual = null;
             return false;
         }
     }
@@ -49,16 +68,15 @@ public class CaixaEletronico {
             this.dispensarDinheiro(valor);
 
             // CRIA O REGISTRO DA TRANSAÇÃO
-            Saque transacao = new Saque(valor, this.contaAtual, this);
-            transacao.setStatus("CONCLUIDA");
+            Transacao transacao = new Saque(valor, this.contaAtual, this);
             
-            // aqui iremos Chamar um TransacaoRepository para salvar o objeto 'transacao' no banco de dados.
-            System.out.println("Transação de SAQUE registrada com sucesso.");
+            // faz a persistencia da transacao no banco
+            this.transacaoRepository.salvar(transacao);     
+            System.out.println("\nTransação de SAQUE registrada com sucesso.");
 
             this.imprimirRecibo("Saque", valor);
         }
     }
-
 
     public void realizarDeposito(double valor) {
         if (this.contaAtual == null) {
@@ -74,10 +92,10 @@ public class CaixaEletronico {
         this.contaRepository.atualizarSaldo(this.contaAtual);   // agora atualiza o saldo no banco
 
         // CRIA O REGISTRO DA TRANSAÇÃO
-        Deposito transacao = new Deposito(valor, this.contaAtual, this);
-        transacao.setStatus("CONCLUIDA");
+        Transacao transacao = new Deposito(valor, this.contaAtual, this);
 
-        // Aqui vamos Chamar um TransacaoRepository para salvar o objeto 'transacao' no banco de dados.
+        // faz a persistencia da transacao no banco
+        this.transacaoRepository.salvar(transacao);     
         System.out.println("Transação de DEPÓSITO registrada com sucesso.");
         
         this.imprimirRecibo("Depósito", valor);
@@ -125,10 +143,10 @@ public class CaixaEletronico {
             this.contaRepository.atualizarSaldo(contaDestino);
 
             // 6. CRIA O REGISTRO DA TRANSAÇÃO
-            Transferencia transacao = new Transferencia(valor, this.contaAtual, contaDestino, this);
-            transacao.setStatus("CONCLUIDA");
+            Transacao transacao = new Transferencia(valor, this.contaAtual, contaDestino, this);
 
-            // 7. aqui vamos Chamar um TransacaoDAO para salvar o objeto 'transacao' no banco de dados.
+            // 7. faz a persistencia da transacao no banco
+            this.transacaoRepository.salvar(transacao);     
             System.out.println("Transação de TRANSFERÊNCIA registrada com sucesso.");
 
             this.imprimirRecibo("Transferência Enviada", valor);
@@ -149,11 +167,11 @@ public class CaixaEletronico {
         System.out.printf("Seu saldo disponível é: R$ %.2f", saldo);
 
         // 2. CRIA O REGISTRO DA TRANSAÇÃO
-        ConsultaSaldo transacao = new ConsultaSaldo(this.contaAtual, this);
-        transacao.setStatus("CONCLUIDA");
+        Transacao transacao = new ConsultaSaldo(this.contaAtual, this);
 
-        // 3. aqui Chamar TransacaoRepository para salvar o objeto 'transacao' no banco de dados.
-        System.out.println("Transação de CONSULTA DE SALDO registrada com sucesso.");
+        // faz a persistencia da transacao no banco
+        this.transacaoRepository.salvar(transacao);
+        System.out.println("\nCONSULTA DE SALDO registrada com sucesso.");
     }
 
     public void encerrarSessao() {
@@ -177,7 +195,7 @@ public class CaixaEletronico {
     }
 
     private void imprimirRecibo(String tipoOperacao, double valor) {
-        System.out.println("Imprimindo recibo...");
+        System.out.println("\nImprimindo recibo...");
         System.out.println("==========================");
         System.out.println("      RECIBO CAIXA       ");
         System.out.println("Data: " + java.time.LocalDate.now());

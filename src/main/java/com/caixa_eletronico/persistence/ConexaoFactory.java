@@ -10,7 +10,7 @@ public class ConexaoFactory {
     
     private static final String URL = "jdbc:postgresql://localhost:5432/caixa_eletronico";
     private static final String USUARIO = "postgres"; 
-    private static final String SENHA = "sua_senha_aqui";
+    private static final String SENHA = "12345";
 
     /**
      * Método estático para obter uma conexão com o banco de dados.

@@ -46,7 +46,7 @@ public class Conta {
 
         this.saldoTotal -= valor;
         this.saldoDisponivel -= valor;
-        System.out.println("Saque de R$" + valor + " realizado com sucesso da conta " + this.numeroConta);
+        System.out.println("\nSaque de R$" + valor + " realizado com sucesso da conta " + this.numeroConta);
         return true;
     }
 
