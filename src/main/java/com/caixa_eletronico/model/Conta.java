@@ -1,5 +1,8 @@
 package com.caixa_eletronico.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Conta {
     private int id;
     private String numeroConta;
@@ -49,6 +52,7 @@ public class Conta {
         System.out.println("\nSaque de R$" + valor + " realizado com sucesso da conta " + this.numeroConta);
         return true;
     }
+
 
     public int getId(){
         return id;

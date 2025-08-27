@@ -8,7 +8,11 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import com.caixa_eletronico.connection.ConexaoFactory;
+
 public class CartaoRepositoryPostgreSQL implements CartaoRepository {
+
+
 
     @Override
     public Cartao buscarPorNumero(String numero) {
@@ -16,7 +20,7 @@ public class CartaoRepositoryPostgreSQL implements CartaoRepository {
         String sql = "SELECT " +
                      "ca.id as cartao_id, ca.numero as cartao_numero, ca.nome_impresso, ca.data_expiracao, ca.pin, " +
                      "co.id as conta_id, co.numero_conta, co.saldo_total, co.saldo_disponivel, " +
-                     "cl.id as cliente_id, cl.nome, cl.email, cl.telefone, cl.endereco, cl.status " +
+                     "cl.id as cliente_id, cl.nome, cl.email, cl.status " +
                      "FROM cartoes ca " +
                      "JOIN contas co ON ca.conta_id = co.id " +
                      "JOIN clientes cl ON co.titular_id = cl.id " +
@@ -32,9 +36,9 @@ public class CartaoRepositoryPostgreSQL implements CartaoRepository {
                 // Processo de reconstrução em 3 etapas, do mais interno para o mais externo
 
                 // 1. Reconstruir Cliente
-                Cliente titular = new Cliente(rs.getString("nome"), rs.getString("email"), rs.getString("telefone"), rs.getString("endereco"));
+                Cliente titular = new Cliente(rs.getString("nome"), rs.getString("email"), null, null);
                 titular.atualizarStatus(StatusCliente.valueOf(rs.getString("status")));
-                
+
                 //titular.setId(rs.getInt("Ccliente_id"));      caso adicione ID ao cliente
 
                 // 2. Reconstruir Conta (usando o Cliente criado acima)
