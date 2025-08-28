@@ -4,6 +4,8 @@ import com.caixa_eletronico.model.Transacao;
 import com.caixa_eletronico.repository.TransacaoRepository;
 import java.sql.*;
 
+import com.caixa_eletronico.connection.ConexaoFactory; // importando classe conexão
+
 public class TransacaoRepositoryPostgreSQL implements TransacaoRepository {
 
     @Override

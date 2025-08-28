@@ -4,12 +4,22 @@ import com.caixa_eletronico.model.*;
 import com.caixa_eletronico.persistence.*;
 import com.caixa_eletronico.repository.*;
 
+
+
+import com.caixa_eletronico.model.Cliente;
+import com.caixa_eletronico.model.Telefone;
+import com.caixa_eletronico.persistence.TelefoneRepositoryPostgreSQL;
+import com.caixa_eletronico.repository.TelefoneRepository;
+
+import java.util.List;
+
+
 import java.util.Scanner;
 
 public class App {
 
     public static void main(String[] args) {
-        
+
         // --- FASE 1: INICIALIZAÇÃO E INJEÇÃO DE DEPENDÊNCIA MANUAL ---
         System.out.println("Inicializando sistema...");
 
@@ -17,7 +27,8 @@ public class App {
         ContaRepository contaRepo = new ContaRepositoryPostgreSQL();
         CartaoRepository cartaoRepo = new CartaoRepositoryPostgreSQL();
         TransacaoRepository transacaoRepo = new TransacaoRepositoryPostgreSQL();
-        
+
+
         // No futuro, o gerente seria carregado do banco de dados com um GerenteRepository.
         // Por enquanto, vamos criá-lo na mão.
         Gerente gerente = new Gerente(1, "Gerente Padrão", "G001");
@@ -26,7 +37,7 @@ public class App {
         CaixaEletronico caixa = new CaixaEletronico("GBA-ATM-001", "Rua Principal, 123", gerente, contaRepo, cartaoRepo, transacaoRepo);
 
         Scanner scanner = new Scanner(System.in);
-        
+
         System.out.println("Sistema pronto para operar.");
 
         // --- FASE 2: LOOP PRINCIPAL DA APLICAÇÃO ---
@@ -97,7 +108,6 @@ public class App {
             }
         }
 
-        System.out.println("Desligando o sistema. Obrigado!");
-        scanner.close();
+
     }
 }

@@ -2,46 +2,52 @@ package com.caixa_eletronico.persistence;
 
 import com.caixa_eletronico.model.*;
 import com.caixa_eletronico.repository.ContaRepository;
+import java.util.ArrayList;
 import java.util.List;
 import java.sql.*;
 
+import com.caixa_eletronico.connection.ConexaoFactory; // importando
+import com.caixa_eletronico.repository.EnderecoRepository;
+import com.caixa_eletronico.repository.TelefoneRepository;
+
 public class ContaRepositoryPostgreSQL implements ContaRepository{
+
+
     @Override
     public Conta buscarPorNumero(String numero) {
-        String sql = "SELECT c.id as conta_id, c.numero_conta, c.saldo_total, c.saldo_disponivel, " +
-                     "cl.id as cliente_id, cl.nome, cl.email, cl.telefone, cl.endereco, cl.status " +
-                     "FROM contas c JOIN clientes cl ON c.titular_id = cl.id WHERE c.numero_conta = ?";
+        String sqlConta = "SELECT c.id as conta_id, c.numero_conta, c.saldo_total, c.saldo_disponivel, " +
+                "cl.id as cliente_id, cl.nome, cl.email, cl.status " +
+                "FROM contas c JOIN clientes cl ON c.titular_id = cl.id WHERE c.numero_conta = ?";
 
         try (Connection conexao = ConexaoFactory.criarConexao();
-             PreparedStatement pstmt = conexao.prepareStatement(sql)) {
-            
+             PreparedStatement pstmt = conexao.prepareStatement(sqlConta)) {
+
             pstmt.setString(1, numero);
             ResultSet rs = pstmt.executeQuery();
 
             if (rs.next()) {
-                // Primeiro, extraímos cada valor da linha retornada pelo banco
+                int clienteId = rs.getInt("cliente_id");
                 String nomeCliente = rs.getString("nome");
                 String emailCliente = rs.getString("email");
-                String telefoneCliente = rs.getString("telefone");
-                String enderecoCliente = rs.getString("endereco");
+                StatusCliente statusCliente = StatusCliente.valueOf(rs.getString("status"));
 
-                // criando o objeto Cliente baseado nos dados da consulta
-                Cliente titular = new Cliente(nomeCliente, emailCliente, telefoneCliente, enderecoCliente);
+                // --- 1. Criar objeto Cliente ---
+                Cliente titular = new Cliente(nomeCliente, emailCliente, null, null);
+                titular.setId(clienteId);
 
-                // criando o objeto Conta baseado nos dados da consulta
+                // --- 2. Criar objeto Conta ---
                 Conta conta = new Conta(rs.getString("numero_conta"), titular, rs.getDouble("saldo_total"));
-                
-                // Preenchendo o ID na conta que veio do banco
-                conta.setId(rs.getInt("conta_id")); 
-                
+                conta.setId(rs.getInt("conta_id"));
+
                 return conta;
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        
-        return null; // Retorna null se não encontrou ou se deu erro
+
+        return null;
     }
+
 
     @Override
     public void atualizarSaldo(Conta conta) {

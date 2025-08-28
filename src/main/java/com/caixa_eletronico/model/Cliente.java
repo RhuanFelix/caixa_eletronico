@@ -1,15 +1,19 @@
 package com.caixa_eletronico.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Cliente {
 
     // --- Atributos ---
+    private int id;
     private String nome;
     private String email;
-    private String telefone;
-    private String endereco;
+    private List<Telefone> telefone;
+    private Endereco endereco;
     private StatusCliente status;
 
-    public Cliente(String nome, String email, String telefone, String endereco) {
+    public Cliente(String nome, String email, List<Telefone> telefone, Endereco endereco) {
         this.nome = nome;
         this.email = email;
         this.telefone = telefone;
@@ -37,9 +41,18 @@ public class Cliente {
     }
 
     // --- Getters e Setters ---
-    
+
+
+    public int getId() {
+        return id;
+    }
+
     public String getNome() {
         return nome;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public void setNome(String nome) {
@@ -54,19 +67,19 @@ public class Cliente {
         this.email = email;
     }
 
-    public String getTelefone() {
+  
+    public List<Telefone> getTelefone() {
         return telefone;
     }
 
-    public void setTelefone(String telefone) {
-        this.telefone = telefone;
+    public void adicionarTelefone(Telefone t) {
+        this.telefone.add(t);
     }
-
-    public String getEndereco() {
+    public Endereco getEndereco() {
         return endereco;
     }
 
-    public void setEndereco(String endereco) {
+    public void setEndereco(Endereco endereco) {
         this.endereco = endereco;
     }
 
