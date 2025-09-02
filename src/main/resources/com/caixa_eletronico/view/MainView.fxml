@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox xmlns="http://javafx.com/javafx/24" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.caixa_eletronico.controller.MainController"
+      spacing="10" styleClass="root"
+      stylesheets="@/java_bank_theme.css">
+
+    <padding>
+        <Insets top="20" right="20" bottom="20" left="20"/>
+    </padding>
+
+    <VBox styleClass="card" spacing="5">
+        <Label styleClass="text-gold" text="INFORMAÇÕES DA CONTA"/>
+        <Label fx:id="nomeLabel" text="Nome:" styleClass="label"/>
+        <Label fx:id="contaLabel" text="Conta:" styleClass="label"/>
+        <Label fx:id="saldoLabel" text="Saldo:" styleClass="label, text-gold"/>
+    </VBox>
+
+    <TextArea fx:id="mensagemArea" prefHeight="150" styleClass="text-area" editable="false"/>
+
+    <HBox spacing="10">
+        <Button text="Consultar Saldo" onAction="#handleConsultarSaldo" styleClass="button, primary"/>
+        <Button text="Saque" onAction="#handleSaque" styleClass="button, primary"/>
+        <Button text="Depósito" onAction="#handleDeposito" styleClass="button, primary"/>
+        <Button text="Transferência" onAction="#handleTransferencia" styleClass="button, primary"/>
+        <Button text="Sair" onAction="#handleSair" styleClass="button, primary"/>
+    </HBox>
+
+</VBox>

@@ -37,6 +37,10 @@ public class Cartao {
         return numero;
     }
 
+    public String getPin() {
+        return pin;
+    }
+
     public String getNomeImpresso() {
         return nomeImpresso;
     }

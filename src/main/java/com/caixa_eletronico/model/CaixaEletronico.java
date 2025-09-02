@@ -54,10 +54,10 @@ public class CaixaEletronico {
 
     //MÉTODOS DE OPERAÇÕES ---
 
-    public void realizarSaque(double valor) {
+    public boolean realizarSaque(double valor) {
         if (this.contaAtual == null) {
             System.out.println("Erro: Nenhuma sessão ativa.");
-            return;
+            return false;
         }
 
         boolean sucesso = this.contaAtual.sacar(valor);     // atualiza o saldo na memoria
@@ -75,7 +75,11 @@ public class CaixaEletronico {
             System.out.println("\nTransação de SAQUE registrada com sucesso.");
 
             this.imprimirRecibo("Saque", valor);
+
+            return true;
         }
+
+        return false;
     }
 
     public void realizarDeposito(double valor) {
@@ -103,20 +107,20 @@ public class CaixaEletronico {
 
     //Orquestra a operação de transferência entre contas.
 
-    public void realizarTransferencia(double valor, String numeroContaDestino) {
+    public boolean realizarTransferencia(double valor, String numeroContaDestino) {
         if (this.contaAtual == null) {
             System.out.println("Erro: Nenhuma sessão ativa.");
-            return;
+            return false;
         }
 
         // 1. Validações iniciais
         if (valor <= 0) {
             System.out.println("Erro: O valor da transferência deve ser positivo.");
-            return;
+            return false;
         }
         if (this.contaAtual.getSaldoDisponivel() < valor) {
             System.out.println("Erro: Saldo insuficiente para realizar a transferência.");
-            return;
+            return false;
         }
         
         // 2. Buscar a conta de destino usando o repository
@@ -125,11 +129,11 @@ public class CaixaEletronico {
         // 3. Validar a conta de destino
         if (contaDestino == null) {
             System.out.println("Erro: A conta de destino não foi encontrada.");
-            return;
+            return false;
         }
         if (this.contaAtual.getNumeroConta().equals(contaDestino.getNumeroConta())) {
             System.out.println("Erro: A conta de origem e destino não podem ser a mesma.");
-            return;
+            return false;
         }
 
         // 4. Executar a transação
@@ -154,6 +158,7 @@ public class CaixaEletronico {
             // Se o saque falhou por alguma razão inesperada (já que o saldo foi pré-checado)
             System.out.println("Ocorreu um erro inesperado ao tentar realizar a transferência.");
         }
+        return true;
     }
     
     public void realizarConsultaSaldo() {
@@ -209,4 +214,7 @@ public class CaixaEletronico {
     // GETTERS
     public String getId() { return id; }
     public Conta getContaAtual() { return contaAtual; }
+    public CartaoRepository getCartaoRepository() {
+        return cartaoRepository;
+    }
 }

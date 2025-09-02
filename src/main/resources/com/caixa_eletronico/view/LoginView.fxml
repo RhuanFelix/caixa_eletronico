@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+
+<VBox xmlns="http://javafx.com/javafx/24" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.caixa_eletronico.controller.LoginController"
+      alignment="CENTER" spacing="15" prefWidth="400" prefHeight="300"
+      stylesheets="@/java_bank_theme.css" styleClass="root">
+
+    <children>
+        <VBox alignment="CENTER" spacing="5">
+            <Label styleClass="logo" text="JAVA" />
+            <Label styleClass="sub-logo" text="BANK" />
+        </VBox>
+
+        <TextField fx:id="txtUsuario" promptText="Usuário" styleClass="text-field" prefWidth="250" maxWidth="250"/>
+        <PasswordField fx:id="txtSenha" promptText="Senha" styleClass="password-field" prefWidth="250" maxWidth="250"/>
+        <Button text="Login" onAction="#handleLogin" styleClass="button, primary"/>
+    </children>
+</VBox>

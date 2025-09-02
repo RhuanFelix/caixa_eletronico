@@ -1,4 +1,4 @@
-package com.caixa_eletronico.persistence;
+package com.caixa_eletronico.connection;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -8,7 +8,7 @@ public class ConexaoFactory {
 
     // --- DADOS DE CONEXÃO ---
     
-    private static final String URL = "jdbc:postgresql://localhost:5432/caixa_eletronico";
+    private static final String URL = "jdbc:postgresql://localhost:5432/CaixaEletronico";
     private static final String USUARIO = "postgres"; 
     private static final String SENHA = "12345";
 
