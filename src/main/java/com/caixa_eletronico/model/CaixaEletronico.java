@@ -60,6 +60,12 @@ public class CaixaEletronico {
             return false;
         }
 
+        // VERIFICA SE O CLIENTE PODE REALIZAR A OPERAÇÃO
+        if (!this.contaAtual.getTitular().podeRealizarTransacao()) {
+            System.out.println("Operação negada. Status do cliente não permite transações.");
+            return false;
+        }
+
         boolean sucesso = this.contaAtual.sacar(valor);     // atualiza o saldo na memoria
 
         if (sucesso) {
@@ -88,6 +94,12 @@ public class CaixaEletronico {
             return;
         }
 
+        // VERIFICA SE O CLIENTE PODE REALIZAR A OPERAÇÃO
+        if (!this.contaAtual.getTitular().podeRealizarTransacao()) {
+            System.out.println("Operação negada. Status do cliente não permite transações.");
+            return;
+        }
+
         // Simula o caixa eletrônico recebendo o dinheiro antes de depositar na conta
         this.receberDinheiro(valor);
 
@@ -110,6 +122,12 @@ public class CaixaEletronico {
     public boolean realizarTransferencia(double valor, String numeroContaDestino) {
         if (this.contaAtual == null) {
             System.out.println("Erro: Nenhuma sessão ativa.");
+            return false;
+        }
+
+        // VERIFICA SE O CLIENTE PODE REALIZAR A OPERAÇÃO
+        if (!this.contaAtual.getTitular().podeRealizarTransacao()) {
+            System.out.println("Operação negada. Status do cliente não permite transações.");
             return false;
         }
 
