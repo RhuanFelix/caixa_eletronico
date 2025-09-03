@@ -13,3 +13,4 @@ Thumbs.db
 *.iml
 .idea/
 .vscode/
+src/main/java/com/caixa_eletronico/connection/ConexaoFactory.java
