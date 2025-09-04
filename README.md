@@ -2,6 +2,9 @@
 
 Este projeto é uma aplicação de desktop que simula as operações de um caixa eletrônico (ATM), desenvolvida em Java com uma interface gráfica utilizando JavaFX. A aplicação permite que usuários se autentiquem e realizem transações bancárias básicas, com todos os dados persistidos em um banco de dados PostgreSQL.
 
+![Demonstração do Jogo Caça ao Tesouro](https://i.imgur.com/GLRXwXp.gif)
+
+
 ## Funcionalidades Principais
 
 - **Autenticação de Usuário:** Login seguro via número do cartão e PIN.
